@@ -277,8 +277,17 @@ class PropositionModal extends Modal {
 
 	onOpen() {
 		const {contentEl} = this;
-        contentEl.createEl("h2", "Generate new Truth Table");
-        contentEl.createEl("p", "Enter the logic expression to generate a truth table for.");
+        contentEl.createEl("h2", { text: "Generate new Truth Table" });
+        contentEl.createEl("p", { text: "Enter the proposition to generate a truth table for." });
+        contentEl.createEl("p", { text: "The following symbols are used to represent logical operators:" });
+        const symbolList = contentEl.createEl("ul");
+        symbolList.createEl("li", { text: "~ - NOT" });
+        symbolList.createEl("li", { text: "& - AND" });
+        symbolList.createEl("li", { text: "| - OR" });
+        symbolList.createEl("li", { text: "^ - XOR" });
+        symbolList.createEl("li", { text: "> - Implies" });
+        symbolList.createEl("li", { text: "< - If and only if" });
+        contentEl.createEl("p", { text: "Parentheses are also supported." })
 
         new Setting(contentEl)
             .setName("Proposition")
@@ -286,6 +295,7 @@ class PropositionModal extends Modal {
                 text.onChange((value) => {
                     this.proposition = value;
                 });
+                text.setPlaceholder("ex.: p&q|~r")
             });
 
         new Setting(contentEl)
