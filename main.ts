@@ -1,12 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-
-interface PluginSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: PluginSettings = {
-	mySetting: 'default'
-}
+import { App, Editor, Modal, Plugin, Setting } from 'obsidian';
 
 // use hardcoded string "p&q|-(r>s)<t|(-q^-s)" -> p and q or neg-(r implies s) iff t or (neg-q xor neg-s)
 // Operator priority (highest - lowest): [~, &, |/^, >, <] (all xor operations must be wrapped in parentheses)
@@ -252,25 +244,14 @@ function generateTruthTable(rpn: RPN) : string {
     return table;
 }
 
+// noinspection JSUnusedGlobalSymbols
 export default class MyPlugin extends Plugin {
-	settings: PluginSettings;
-
 	async onload() {
-		await this.loadSettings();
-
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			id: 'generate-truth-table',
+			name: 'Generate Truth Table',
+			editorCallback: (editor: Editor) => {
                 const currentLine = editor.getCursor().line;
                 const prevData = editor.getLine(currentLine);
                 new PropositionModal(this.app, (proposition) => {
@@ -280,29 +261,8 @@ export default class MyPlugin extends Plugin {
                 }).open();
 			}
 		});
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-	}
-
-	onunload() {
-
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
 	}
 }
 
@@ -342,31 +302,5 @@ class PropositionModal extends Modal {
 	onClose() {
 		const {contentEl} = this;
 		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
