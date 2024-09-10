@@ -1,7 +1,7 @@
 {
 	"id": "logic-truth-table-generator",
 	"name": "Logic Truth Table Generator",
-	"version": "0.0.1-DEV",
+	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
 	"description": "Automatically generate a truth table from a latex expression for a logic proposition.",
 	"author": "Lily Redpath",
